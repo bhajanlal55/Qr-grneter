@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hacker QR Generator - MR.PANWAR</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#071018;
+  --accent:#00ff88;
+  --gold:#FFD700;
+  --glass: rgba(255,255,255,0.03);
+  --shadow: 0 8px 30px rgba(0,0,0,0.6);
+}
+body{margin:0;padding:0;background:var(--bg);font-family:'Inter', sans-serif;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;}
+.container{width:100%;max-width:400px;margin:20px;padding:20px;background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;}
+h1{font-family:'Share Tech Mono', monospace;color:var(--accent);text-align:center;font-size:24px;margin:0;}
+label{font-size:13px;color:#9ddfbf;font-weight:600;margin-bottom:4px;}
+textarea{width:100%;padding:12px;border-radius:8px;background:var(--glass);border:1px solid rgba(0,255,136,0.04);color:#e6fff3;font-family:'Share Tech Mono', monospace;font-size:14px;outline:none;resize:none;min-height:80px;}
+.buttons{display:flex;gap:8px;justify-content:space-between;margin-bottom:10px;}
+button{flex:1;padding:12px;border-radius:10px;border:none;font-family:'Share Tech Mono', monospace;font-weight:700;color:#001614;background:linear-gradient(90deg, rgba(0,255,136,0.18), rgba(0,255,136,0.06));cursor:pointer;transition:transform .1s;}
+button:active{transform:translateY(1px);}
+#qrContainer{display:flex;flex-direction:column;align-items:center;margin-top:10px;gap:12px;}
+#qrCanvas canvas{width:100% !important;height:auto !important;} /* Full width of container */
+#qrName{font-family:'Share Tech Mono', monospace;font-size:20px;color:var(--gold);font-weight:bold;text-align:center;text-shadow:0 0 5px #FFD700,0 0 15px #FFD700,0 0 25px #FFD700;animation:flicker 2s infinite alternate;}
+@keyframes flicker{0%{opacity:0.8;text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;}25%{opacity:1;text-shadow:0 0 10px #FFD700,0 0 20px #FFD700,0 0 30px #FFD700;}50%{opacity:0.85;text-shadow:0 0 5px #FFD700,0 0 15px #FFD700;}75%{opacity:0.95;text-shadow:0 0 8px #FFD700,0 0 18px #FFD700;}100%{opacity:0.9;text-shadow:0 0 5px #FFD700,0 0 10px #FFD700;}}
+.downloadBtn{margin-top:12px;text-decoration:none;text-align:center;padding:12px;background:#FFD700;color:#071018;border-radius:12px;display:block;font-family:'Share Tech Mono', monospace;font-weight:bold;box-shadow:0 0 10px #FFD700;}
+.status{text-align:center;font-size:14px;color:#FFD700;margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>H4CK-QR</h1>
+  <label for="inputText">Text / Link</label>
+  <textarea id="inputText" placeholder="Yahan text ya URL daalein"></textarea>
+  <div class="buttons">
+    <button id="generateBtn">Generate</button>
+    <button id="clearBtn">Clear</button>
+    <button id="copyBtn">Copy</button>
+  </div>
+
+  <div id="qrContainer">
+    <div id="qrCanvas">
+      <div id="emptyState" style="color:#7fbda0;text-align:center;">QR Preview</div>
+    </div>
+    <div id="qrName">MR.PANWAR</div>
+  </div>
+
+  <a id="downloadBtn" class="downloadBtn" download="qr.png" href="#">Download PNG</a>
+  <div class="status" id="status">Ready</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<script>
+const inputText=document.getElementById('inputText');
+const generateBtn=document.getElementById('generateBtn');
+const clearBtn=document.getElementById('clearBtn');
+const copyBtn=document.getElementById('copyBtn');
+const qrCanvas=document.getElementById('qrCanvas');
+const emptyState=document.getElementById('emptyState');
+const downloadBtn=document.getElementById('downloadBtn');
+const status=document.getElementById('status');
+
+generateBtn.addEventListener('click', async ()=>{
+  const text=inputText.value.trim();
+  if(!text){ alert('Pehle text ya link daalein'); return; }
+  qrCanvas.innerHTML='';
+  const canvas=document.createElement('canvas');
+  canvas.width=400; // QR size bada kiya
+  canvas.height=400;
+  try{
+    await QRCode.toCanvas(canvas,text,{errorCorrectionLevel:'H',margin:2});
+    qrCanvas.appendChild(canvas);
+    downloadBtn.href=canvas.toDataURL('image/png');
+    status.textContent='QR Generated';
+  }catch(e){ alert('Error'); console.error(e);}
+});
+
+clearBtn.addEventListener('click',()=>{
+  inputText.value='';
+  qrCanvas.innerHTML=''; qrCanvas.appendChild(emptyState);
+  status.textContent='Cleared';
+});
+
+copyBtn.addEventListener('click',()=>{
+  const text=inputText.value.trim();
+  if(!text){ alert('Kuch copy karne layak nahi'); return;}
+  navigator.clipboard.writeText(text).then(()=>{status.textContent='Copied!';});
+});
+</script>
+</body>
+</html>
